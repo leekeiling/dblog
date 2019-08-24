@@ -2,7 +2,7 @@ theme: cube
 
 # background display for mobile, not for pc
 header:
-  background: http:// 
+  background: https://github.com/leekeiling/dblog/blob/master/themes/cube/u=1947381124,2132773454&fm=26&gp=0.jpg?raw=true 
   # both pc and mobile required title(make it the same as your hexo site _config.yml's title)
   title: keeling的博客
 
@@ -10,7 +10,7 @@ header:
 # background display for pc
 # you can use url or path relative
 # `background: background.png` refers to the path "source/images/background.png"
-background: http://
+background: https://github.com/leekeiling/dblog/blob/master/themes/cube/u=1947381124,2132773454&fm=26&gp=0.jpg?raw=true
 
 
 # the background image width and height (you can see your image file to get them)
@@ -57,7 +57,7 @@ menu:
 sidebar:
   links:
     - title: GitHub
-      url: https://github.com/keiling
+      url: https://github.com/leekeiling
       # icon can be url or path
       icon: http://cube-1252774894.cosgz.myqcloud.com/links/GitHub.png
       #    - title: Coding
@@ -117,12 +117,12 @@ music_setting:
 # url: http://www.yoururl.com/path/to/.mp3 or .lrc or ...
 # you'd better place your music and image, lrc to another site, and use url instead of path
 # if you don't want to use this widget, just make that `music: `
-#music:
-#  - title: Dear friends
-#    author: TRIPLANE
-#    source: http://cube-1252774894.cosgz.myqcloud.com/music/source/TRIPLANE - Dear friends.mp3
-#    lrc: http://cube-1252774894.cosgz.myqcloud.com/music/lrc/Dear friends - TRIPLANE.lrc
-#    image: http://cube-1252774894.cosgz.myqcloud.com/music/image/TRIPLANE - Dear friends.jpg
+music:
+  - title: Dear friends
+    author: TRIPLANE
+    source: http://cube-1252774894.cosgz.myqcloud.com/music/source/TRIPLANE - Dear friends.mp3
+    lrc: http://cube-1252774894.cosgz.myqcloud.com/music/lrc/Dear friends - TRIPLANE.lrc
+    image: http://cube-1252774894.cosgz.myqcloud.com/music/image/TRIPLANE - Dear friends.jpg
 #  - title: Butter-Fly
 #    author: 和田光司
 #    source: http://cube-1252774894.cosgz.myqcloud.com/music/source/和田光司 - Butter-Fly (ピアノヴァージョン).mp3
