@@ -2,7 +2,7 @@ theme: cube
 
 # background display for mobile, not for pc
 header:
-  background: 
+  background: http:// 
   # both pc and mobile required title(make it the same as your hexo site _config.yml's title)
   title: keeling的博客
 
