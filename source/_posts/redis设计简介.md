@@ -3,7 +3,8 @@ title: redis设计简介
 date: 2018-07-23 01:16:12
 tags: 数据库 redis
 ---
-
+redis 底层实现原理简介  
+<!--more-->
 ### 多数据库
 
 	redis是字典结构的存储服务器，一个redis实例提供多个用来存储数据的字典，客户端可以指定将数据存储在哪个字典中。
@@ -81,17 +82,6 @@ typedef struct intset{
 
 压缩列表是为了节约内存开发的，是由一系列特殊编码的连续内存块组成的顺序型数据结构。一个压缩列表可以包含任意多个结点，每个结点可以保存一个字节数组或者一个整数值。
 
-<center>
-    <img src="C:\Users\USER\Desktop\仓库\redis\图片\2.png"/>
-</center>
-
-
-结点数据结构如下：
-
-<center>
-    <img src="C:\Users\USER\Desktop\仓库\redis\图片\1.png"/>
-</center>
-
 ### 对象
 
 | 类型常量     | 描述         |
@@ -135,10 +125,6 @@ RDB通过保存键值对来记录数据库，AOF是通过保存执行的写命�
 
 AOF文件载入与数据还原:
 
-<center>
-    <img src="C:\Users\USER\Desktop\仓库\redis\图片\3.png"/>
-</center>
-
 
 AOF重写：
 
@@ -156,14 +142,6 @@ redis是事件驱动程序，分为：文件事件、时间事件
 
 时间事件：redis定时操作
 
-文件事件处理器构成
-
-<center>
-    <img src="C:\Users\USER\Desktop\仓库\redis\图片\4.png"/>
-</center>
-
-
-	
 
 事件类型：AE_READABLE 	AE_WRITABLE
 
@@ -256,15 +234,7 @@ Redis集群通过分片的方式保存数据库中的键值对：集群的整个
 
 当数据库中的16384个槽都有被处理时，处于上线状态；否则处于下线状态。
 
-<center>
-    <img src="C:\Users\USER\Desktop\5.png"/>
-</center>
 ASK错误处理：
-
-<center>
-    <img src="C:\Users\USER\Desktop\6.png"/>
-</center>
-
 
 
 ASKING命令：
@@ -310,4 +280,3 @@ ASKING命令：
 1. 事务开始
 2. 命令入队
 3. 事务执行
-
