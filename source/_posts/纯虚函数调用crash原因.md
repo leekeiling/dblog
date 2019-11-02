@@ -1,5 +1,10 @@
-## 纯虚函数调用crash原因
-
+---
+title: 纯虚函数调用crash原因
+date: 2019-11-03 01:18:01
+tags: c++
+---
+写个小程序，构造函数中调用纯虚函数，然后从汇编角度看崩溃原因  
+<!--more-->
 ```C++
 #include <iostream>
 using namespace std;
