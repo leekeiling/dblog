@@ -5,7 +5,7 @@ tags: c++
 ---
 写个小程序，构造函数中调用纯虚函数，然后从汇编角度看崩溃原因  
 <!--more-->
-```C++
+```
 #include <iostream>
 using namespace std;
 class A;
@@ -80,8 +80,8 @@ D类构造过程中把D对象的this指针赋值给变量d
 <center>
     <img src="https://raw.githubusercontent.com/leekeiling/PicturePool/master/pics/2bf3b15a-58f0-4cd4-ae92-521409a8327d.png"/>
 </center>
-- 在B类构造函数用
-- B对象构造函数中调用d->func(), 汇编代码已经打出来了
+ 在B类构造函数用   
+ B对象构造函数中调用d->func(), 汇编代码已经打出来了  
 
 ```C++
 mov 0x20170a(%rip), %rax  ;获取全局变量d地址 保存到寄存器 rax中
@@ -101,24 +101,24 @@ callq *%rax               ；调用rax寄存器中保存到函数地址
 <center>
     <img src="https://raw.githubusercontent.com/leekeiling/PicturePool/master/pics/7892275f-aa3f-4748-9c04-8f957d2cf933.png"/>
 </center>
-- 看下d变量，d=0x7ffffffd880, 跟寄存器rax保存到值一样  
-- 看下d变量地址，d=0x6022d8，跟上面到汇编代码的注释一样  
+ 看下d变量，d=0x7ffffffd880, 跟寄存器rax保存到值一样     
+ 看下d变量地址，d=0x6022d8，跟上面到汇编代码的注释一样    
 
 
 <center>
     <img src="https://raw.githubusercontent.com/leekeiling/PicturePool/master/pics/bd9d75ea-7721-4f9c-94b8-c948892acc91.png"/>
 </center>
-- 打印下d对象虚函数表指针指向的虚函数表地址， vtable_address=0x400d28, 注意是D类的虚函数表地址, 也是A类的虚函数表地址
+ 打印下d对象虚函数表指针指向的虚函数表地址， vtable_address=0x400d28, 注意是D类的虚函数表地址, 也是A类的虚函数表地址
 
 
 <center>
     <img src="https://raw.githubusercontent.com/leekeiling/PicturePool/master/pics/5cf93891-765d-451a-8909-9f4c3f2f72f8.png"/>
 </center>
-- 打印下vtable_adress=0x400d28对应下的虚函数地址， func_address=0x400950，显然纯虚函数地址并没有等于0，它指向的地址是随机的 
+ 打印下vtable_adress=0x400d28对应下的虚函数地址， func_address=0x400950，显然纯虚函数地址并没有等于0，它指向的地址是随机的 
 
 <center>
     <img src="https://raw.githubusercontent.com/leekeiling/PicturePool/master/pics/3ecd24d5-e7f7-4702-a462-0c1152a57763.png"/>
 </center>
-- 继续单步执行汇编，顺利调用func_address=0x400950的函数，函数来源于抽象类A的虚函数表
-- 往下的堆栈就看不懂了
+  继续单步执行汇编，顺利调用func_address=0x400950的函数，函数来源于抽象类A的虚函数表    
+  往下的堆栈就看不懂了  
 
