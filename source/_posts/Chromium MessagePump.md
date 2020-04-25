@@ -1,4 +1,11 @@
-#### Chromium MessagePump
+---
+title: Chromium MessagePump
+date: 2020-04-25 11:52:23
+tags: chromium
+---
+chromium 任务调度机制
+<!--more-->
+
 本文收益
 - 旧版和新版Chromium MessagePump任务调度策略的主要逻辑
 - 主要介绍OnNonDelayedLooperCallback和OnDelayedLooperCallback的逻辑
@@ -16,7 +23,11 @@ MessageLoop维护四个任务队列:
 
 #### OnNonDelayedLooperCallback
  触发OnNonDelayedLooperCallback时, MessagePump任务调度策略如下:  
- ![image][https://github.com/leekeiling/PicturePool/blob/master/pics/messagepump1.png?raw=true]
+
+<center>
+    <img src="https://github.com/leekeiling/PicturePool/blob/master/pics/messagepump1.png?raw=true"/>
+</center>
+
  在OnNonDelayedLooperCallback, DoWork和DoDelayedWork以轮转法方式交替执行.   
 
 **DoWork和DoDelayedWork做了啥?**  
@@ -36,7 +47,10 @@ DoIdleWork清空Defer Queue里面的pending任务, 然后ScheduleDelayedWork向�
 
 #### OnDelayedLooperCallback
 触发OnDelayedLooperCallback时, MessagePump任务调度策略如下:  
-<pic2>
+<center>
+    <img src="https://github.com/leekeiling/PicturePool/blob/master/pics/messagepump2.png?raw=true"/>
+</center>
+
 首先是DoDelayedWork从Delayed Queue里面执行DelayedWork. 流程中MoreDelayedWork判断是否有其他延时任务, 若有则更新timeFd.  
 
 最终都需要调用ScheduleWork, 为啥?  
@@ -53,16 +67,23 @@ DoSomeWork第一步从TaskResource拿出Task来执行, TaskResource由SequenceMa
 
 SequenceManager对Task细粒度控制, 同时提供Selector从任务队列中取出Task。  
 
-Selector主要负责任务调度。  
-<pic3>
+Selector主要负责任务调度。
+<center>
+    <img src="https://github.com/leekeiling/PicturePool/blob/master/pics/messagepump3.png?raw=true"/>
+</center>  
+
 
 结合代码过一遍上面流程～结合代码过一遍上面流程～  
 
 首先是回调开始：  
-<pic4>
+<center>
+    <img src="https://github.com/leekeiling/PicturePool/blob/master/pics/messagepump4.png?raw=true"/>
+</center>
 
 回调结束：  
-<pic5>
+<center>
+    <img src="https://github.com/leekeiling/PicturePool/blob/master/pics/messagepump5.png?raw=true"/>
+</center>
 
 OnNonLooperCallback开始，首先清空唤醒此次callback的non_delayed_fd描述符，读取的值保存到pre_work_value.   
 
@@ -78,17 +99,23 @@ OnNonLooperCallback开始，首先清空唤醒此次callback的non_delayed_fd描
 - OnNonLooperCallback回调收尾，pre_work_value == kTryNativeTasksBeforeIdleBit, 说明此次回调仅仅由kTryNativeTasksBeforeIdleBit起作用，messagepump处于Idle状态
 
 接下来是处理native任务：  
-<pic6>
+<center>
+    <img src="https://github.com/leekeiling/PicturePool/blob/master/pics/messagepump6.png?raw=true"/>
+</center>
 
 在while循环里，delegate_是ThreadControllerWithMessagePump对象，DoSomeWork处理$(batch size)数量的delayed task或者immediate task。  
 
 **DoSomeWork**  
-<pic7>  
+<center>
+    <img src="https://github.com/leekeiling/PicturePool/blob/master/pics/messagepump7.png?raw=true"/>
+</center>
 DoSomeWork在for循环处理work_batch_size数量的任务, 它从task_source取出任务, 由task_annotator代理执行任务.  
 任务调度策略主要在task_source->TakeTask()方法, task_source是SequenceManager对象.  
 
 **TaskTask**  
-<pic8>
+<center>
+    <img src="https://github.com/leekeiling/PicturePool/blob/master/pics/messagepump8.png?raw=true"/>
+</center>
 
 主要逻辑如下:  
 - ReloadEmptyWorkQueues将所有空WorkQueue与IncommingQueue交换指针,逻辑上将IncommingQueue的任务装载到WorkQueue
@@ -112,25 +139,33 @@ DelayedWorkQueueSet
 因此, selector任务调度首先从QueueSet中选择某种优先级的Heap, 然后在这个Heap中选择包含oldest任务的WorkQueue, 最后从WorkQueue取出队首任务.  
 
 **SelectWorkQueueToService**  
-<pic9>
+<center>
+    <img src="https://github.com/leekeiling/PicturePool/blob/master/pics/messagepump9.png?raw=true"/>
+</center>
 
 SelectWorkQueueToService首先从active_priorities中获取下一个优先级类型. active_priorites保存目前活跃的优先级种类, active_priorities按每个优先级的key值大小排序, 下一次优先级种类的选择依据最小key值.  
 第二步更新selection_count值, selection_count参与优先级key大小的更新.   
 第三步更新priority key值大小并重新调整在active_priorities的排序. 每次从从active_priorities中选择priority, 需要重新更新该priority的key值大小以及在active_priorities的排序.   
 key大小的更新实现在GetSortKeyForPriority中,   
-<pic10>
+<center>
+    <img src="https://github.com/leekeiling/PicturePool/blob/master/pics/messagepump10.png?raw=true"/>
+</center>
 
 动态更新priority key值大小的原因是防止其他低优先级队列被高优先级队列饿死(kControlPriority和kBestEffortPriority除外).  
 
 上文selector提到, 当我们确定选择priority种类时, 就可以从DelayedWorkQueueSet或者ImmediateWorkQueueSet中选择对应的优先级种类的WorkQueue堆, 然后从该WorkQueue中选择包含oldest任务的WorkQueue.  
 
 现在的问题是我们确定了priority, 现在是DelayedWorkQueueSet和ImmediateWorkQueueSet的选择问题. 第四步ChooseWithPriority有对应的策略实现, ChooseWithPriority函数实现如下:  
-<pic11>
+<center>
+    <img src="https://github.com/leekeiling/PicturePool/blob/master/pics/messagepump11.png?raw=true"/>
+</center>
 
 immediate_starvation_count标记选择DelayedWorkQueueSet的次数, 当immediate_starvation_count > kMaxDelayedStarvationTasks, 说明已经开始饿死ImmediateWorkQueueSet, 将优先选择ImmediateWorkQueueSet.    
 假如还达不饿死ImmediateWorkQueueSet条件, 选择哪个WorkQueueSet由ChooseImmediateOrDelayedTaskWithPriority方法决策.  
 
-<pic12>
+<center>
+    <img src="https://github.com/leekeiling/PicturePool/blob/master/pics/messagepump12.png?raw=true"/>
+</center>
 
 在ChooseImmediateOrDelayedTaskWithPriority中, GetWithPriorityAndroidEnqueueOrder是从WorkQueueSet中选择WorkQueue以及WorkQueue插入到集合时的序号.    
 
@@ -140,7 +175,9 @@ ChooseImmediateOrDelayedTaskWithPriority会从ImmediateWorkQueueSet和DelayedWor
 从TaskSource中选取到WorkQueue之后，就是从WorkQueue队首获取任务closure，最后是RunTask。  
 
 #### OnDelayedLooperCallback
-<pic13>
+<center>
+    <img src="https://github.com/leekeiling/PicturePool/blob/master/pics/messagepump13.png?raw=true"/>
+</center>
 在分析OnNonDelayedLooperCallback基础上，OnDelayedLooperCallback逻辑并不复杂。  
   - 首先清空delayed_fd数据
   - delegate调用DoSomeWork；DoSomeWork的流程在前面已经分析过了
